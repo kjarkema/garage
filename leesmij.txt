@@ -1,0 +1,81 @@
+GARAGE - ONDERHOUDSBOEKJE - LEESMIJ
+
+Bestanden (alle vijf in dezelfde map op GitHub zetten)
+- index.html            de app
+- manifest.webmanifest  zorgt dat hij als app op je telefoon kan
+- icon-180.png          app-icoon iPhone
+- icon-192.png          app-icoon Android
+- icon-512.png          app-icoon Android (groot)
+
+Online zetten met GitHub Pages
+1. Maak op GitHub een nieuwe repository, bijvoorbeeld "garage".
+2. Add file > Upload files > sleep alle vijf de bestanden erin > Commit.
+3. Settings > Pages > Source: Deploy from a branch, branch "main", map "/ (root)" > Save.
+4. Na een paar minuten staat de app op:
+   https://<jouw-gebruikersnaam>.github.io/garage/
+
+Op je telefoon zetten
+- iPhone: open de link in Safari > Deel-knop > Zet op beginscherm.
+- Android: open de link in Chrome > menu > Toevoegen aan startscherm.
+Het icoon is de neon-snelheidsmeter. Zelf een ander icoon? Vervang de drie png's door
+eigen afbeeldingen met dezelfde naam en afmetingen.
+
+Bediening
+- Bij het openen verschijnt een korte intro: tik om te starten (één keer per sessie).
+- Hoofdmenu: Garage, Status, Onderhoudsboekje, Nieuw velletje, Motor toevoegen, Back-up
+  en Geluid aan/uit.
+- In de garage blader je met de pijlen of door te vegen langs je motoren.
+- De geluidjes worden door de app zelf gemaakt (geen geluidsbestanden). Zet je telefoon op
+  stil of kies Geluid: uit in het hoofdmenu.
+
+Hoe de garage werkt
+- Elke motor heeft een lijst onderdelen met een interval in km en/of maanden.
+- Een balk loopt leeg naarmate het onderhoud nadert:
+  groen = meer dan de helft over, geel = 25-50%, oranje = 10-25%, rood = minder dan 10%,
+  rood knipperend = over tijd.
+- Tijdsintervallen (bijv. remvloeistof elke 2 jaar) worden omgerekend naar verwachte km
+  met jouw gemiddelde km per maand. Dat wordt berekend uit je tellerstanden, of je stelt
+  het zelf in bij Gegevens en uiterlijk. Daarom staat er bij die onderdelen een ±.
+- Werk af en toe je tellerstand bij in de garage, dan kloppen de balken beter.
+- Noteer je een velletje met bijvoorbeeld "Remblokken voor", dan begint die balk opnieuw.
+
+Eerste keer instellen (belangrijk)
+Zonder velletjes rekent de app vanaf je aanschaf. Alles wat sindsdien niet is genoteerd
+staat dan meteen op "over tijd". Twee manieren om dat recht te zetten:
+- Ga naar Intervallen en vul per onderdeel "Laatst gedaan bij km" en/of "Laatst gedaan op" in.
+- Of maak velletjes aan voor het onderhoud dat je al gedaan hebt (met de juiste datum).
+
+Intervallen Ténéré 700 (2019-2024)
+Overgenomen uit het Europese schema van het instructieboekje, via maintenanceschedule.com
+(gecontroleerd tegen Yamaha owner's manual BHL-28199-E0):
+- Motorolie: 10.000 km of 1 jaar
+- Oliefilter, luchtfilter, bougies: 20.000 km
+- Kleppen controleren: 40.000 km
+- Remvloeistof: 2 jaar, remslangen: 4 jaar, koelvloeistof: 3 jaar
+- Ketting controleren/smeren: 1.000 km (en na wassen of regen)
+Niet in het boekje, dus een schatting die je zelf kunt aanpassen:
+- Remblokken voor 15.000 km, achter 20.000 km
+- Band voor 12.000 km, achter 8.000 km (of 5 jaar)
+- Ketting & tandwielen 25.000 km, accu 4 jaar
+Voor andere motoren is er een standaardlijst (allemaal schatting). Vul daar de waarden uit
+het instructieboekje van die motor in bij Intervallen.
+
+Waar staan je gegevens?
+- Alleen in de browser op het toestel waarop je de app gebruikt.
+- Op GitHub staat alleen de code; kenteken en framenummer komen daar niet terecht.
+- Safari op de iPhone kan sitegegevens opruimen als je de app lang niet gebruikt.
+- Maak dus regelmatig een back-up: startscherm > Back-up opslaan. Op je telefoon opent dan
+  het deelmenu; kies daar bijvoorbeeld iCloud Drive, Google Drive, Bestanden of WhatsApp naar
+  jezelf. Op een computer (of als delen niet lukt) wordt het bestand gewoon gedownload.
+  De app waarschuwt als je laatste back-up ouder is dan 30 dagen.
+- Annuleer je het deelmenu, dan telt het niet als back-up.
+- Back-ups uit de vorige versie van de app kun je gewoon terugzetten.
+
+Uitdraai maken
+- Motor > Onderhoudsboekje > Uitdraai maken > in het printvenster Opslaan als PDF.
+- De uitdraai bevat aanschafgegevens, alle velletjes op datumvolgorde, de totale kosten
+  en een overzicht van de onderhoudsstatus.
+
+Meldingen
+- Je ziet de waarschuwingen als je de app opent (startscherm en garage).
+- Echte pushmeldingen kunnen niet met een losse pagina op GitHub; daar is een server voor nodig.

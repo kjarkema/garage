@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Garage">
+<meta name="theme-color" content="#05040a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<title>Garage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,700;1,800;1,900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05040a; --panel:rgba(18,16,30,.86); --panel2:#1c1929; --line:#2e2a44; --text:#ECEAF6; --muted:#9A95B5;
+  --cyan:#2EE6F0; --magenta:#FF2BD6;
+  --green:#39FF88; --yellow:#FFE14D; --orange:#FF9A2E; --red:#FF3B5C;
+  --head:"Exo 2", "Arial Black", system-ui, sans-serif;
+  --body:"Rajdhani", "Arial Narrow", system-ui, -apple-system, sans-serif;
+  --cut:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 64px);background:var(--bg)}
+body{margin:0;min-height:100%;color:var(--text);font-family:var(--body);font-size:18px;font-weight:500;line-height:1.4;-webkit-text-size-adjust:100%;background:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:rgba(5,4,10,.92)}
+
+/* ---------- Garagedecor ---------- */
+.scene{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;
+  background:
+    radial-gradient(ellipse 60% 30% at 20% 12%, rgba(255,43,214,.20), transparent 70%),
+    radial-gradient(ellipse 55% 28% at 85% 18%, rgba(46,230,240,.16), transparent 70%),
+    linear-gradient(180deg,#0b0916 0%,#130d24 46%,#06050c 60%,#040309 100%)}
+.scene::before{content:"";position:absolute;inset:0 0 40% 0;
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 2px, transparent 2px 120px),
+             repeating-linear-gradient(0deg, rgba(255,255,255,.02) 0 2px, transparent 2px 60px)}
+.tube{position:absolute;height:4px;border-radius:2px;background:#fff;box-shadow:0 0 6px var(--c),0 0 18px var(--c),0 0 48px var(--c),0 0 90px var(--c);animation:tubeOn 1.6s steps(1,end) both}
+.tube.v{width:4px;height:auto}
+.t1{--c:var(--magenta);top:calc(env(safe-area-inset-top,0px) + 8px);left:4%;width:44%}
+.t2{--c:var(--cyan);top:calc(env(safe-area-inset-top,0px) + 18px);right:4%;width:36%;animation-delay:.25s}
+.t3{--c:var(--cyan);top:22%;bottom:48%;left:4px;animation-delay:.45s}
+.t4{--c:var(--magenta);top:28%;bottom:44%;right:4px;animation-delay:.6s}
+@keyframes tubeOn{0%{opacity:0}12%{opacity:1}18%{opacity:.2}26%{opacity:1}34%{opacity:.4}40%,100%{opacity:1}}
+.horizon{position:absolute;left:0;right:0;top:60%;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--magenta),transparent);box-shadow:0 0 16px var(--cyan);opacity:.6}
+.floor{position:absolute;left:-60%;right:-60%;top:60%;bottom:-10%;transform:perspective(420px) rotateX(64deg);transform-origin:top center;
+  background:repeating-linear-gradient(90deg, rgba(46,230,240,.22) 0 2px, transparent 2px 90px),
+             repeating-linear-gradient(0deg, rgba(255,43,214,.16) 0 2px, transparent 2px 90px);
+  -webkit-mask-image:linear-gradient(to bottom, transparent, #000 35%);mask-image:linear-gradient(to bottom, transparent, #000 35%)}
+.wet{position:absolute;left:0;right:0;top:60%;bottom:0;background:linear-gradient(180deg, rgba(46,230,240,.08), transparent 40%, rgba(255,43,214,.05))}
+@media (prefers-reduced-motion: reduce){.tube{animation:none}}
+
+/* ---------- Kopbalk ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:58px;
+  background:linear-gradient(90deg,rgba(5,4,10,.95),rgba(5,4,10,.75));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.bar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--magenta),var(--cyan) 60%,transparent)}
+.bar[hidden]{display:none}
+.bar h1{margin:0;font-family:var(--head);font-style:italic;font-weight:900;font-size:1.4rem;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{display:inline-flex;align-items:center;gap:4px;color:#05040a;background:var(--cyan);text-decoration:none;font:italic 800 .95rem var(--head);text-transform:uppercase;
+  padding:8px 14px 8px 10px;clip-path:polygon(10px 0,100% 0,calc(100% - 8px) 100%,0 100%);flex:0 0 auto}
+.back[hidden]{display:none}
+
+main{max-width:680px;margin:0 auto;padding:16px 14px 48px}
+h2{font-family:var(--head);font-style:italic;font-weight:900;font-size:1.7rem;line-height:1.05;margin:6px 0 6px;text-transform:uppercase}
+h3{font-family:var(--head);font-style:italic;font-weight:800;font-size:1.15rem;margin:26px 0 10px;color:var(--cyan);text-transform:uppercase;letter-spacing:.02em}
+p{margin:0 0 12px}
+.muted{color:var(--muted)}
+.small{font-size:.92rem}
+
+.chrome{font-family:var(--head);font-style:italic;font-weight:900;text-transform:uppercase;line-height:.95;
+  background:linear-gradient(180deg,#ffffff 0%,#d9ecff 38%,#5d7896 50%,#c8e6ff 64%,#ffffff 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:.5px rgba(255,255,255,.25);
+  filter:drop-shadow(0 0 10px rgba(46,230,240,.55)) drop-shadow(0 2px 0 rgba(255,43,214,.6))}
+
+/* ---------- Panelen ---------- */
+.hud{position:relative;background:var(--panel);clip-path:var(--cut);padding:14px 16px;margin:12px 0}
+.hud::before{content:"";position:absolute;left:14px;right:0;top:0;height:2px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.hud-title{font:italic 800 .95rem var(--head);text-transform:uppercase;color:var(--cyan);letter-spacing:.04em;margin-bottom:8px}
+
+/* ---------- Hoofdmenu ---------- */
+.title-block{text-align:left;margin:22px 0 6px}
+.title-block .chrome{font-size:clamp(3rem,15vw,4.6rem)}
+.title-block .tag{font:italic 700 1rem var(--head);color:var(--magenta);text-transform:uppercase;letter-spacing:.18em;margin-top:2px;text-shadow:0 0 10px rgba(255,43,214,.7)}
+.menu{display:flex;flex-direction:column;gap:7px;margin:14px 0}
+.menu .mi{position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;min-height:56px;padding:10px 22px 10px 24px;border:0;cursor:pointer;text-align:left;text-decoration:none;
+  background:linear-gradient(90deg,rgba(22,19,38,.92),rgba(22,19,38,.45));color:var(--text);
+  clip-path:polygon(0 0,100% 0,calc(100% - 16px) 100%,0 100%)}
+.menu .mi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--cyan);opacity:.4}
+.menu .mi .lbl{font:italic 900 1.3rem var(--head);text-transform:uppercase;letter-spacing:.01em}
+.menu .mi .sub{font:600 .95rem var(--body);color:var(--muted);text-align:right;max-width:42%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu .mi:hover,.menu .mi:focus-visible,.menu .mi:active,.menu .mi.hot{outline:none;background:linear-gradient(90deg,var(--cyan) 0%,rgba(46,230,240,.55) 55%,rgba(46,230,240,0) 100%);color:#05040a}
+.menu .mi:hover .sub,.menu .mi:focus-visible .sub,.menu .mi:active .sub,.menu .mi.hot .sub{color:#05040a}
+.menu .mi:hover::before,.menu .mi:focus-visible::before,.menu .mi.hot::before{background:var(--magenta);opacity:1}
+.menu .mi[disabled]{opacity:.35;cursor:not-allowed}
+.menu .mi.danger .lbl{color:var(--red)}
+.menu.intro-anim .mi{animation:miIn .45s cubic-bezier(.2,.8,.2,1) both}
+.menu.intro-anim .mi:nth-child(2){animation-delay:.05s}.menu.intro-anim .mi:nth-child(3){animation-delay:.1s}
+.menu.intro-anim .mi:nth-child(4){animation-delay:.15s}.menu.intro-anim .mi:nth-child(5){animation-delay:.2s}
+.menu.intro-anim .mi:nth-child(6){animation-delay:.25s}.menu.intro-anim .mi:nth-child(7){animation-delay:.3s}
+@keyframes miIn{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.menu.intro-anim .mi{animation:none}}
+
+.notice{display:flex;gap:10px;align-items:center;background:rgba(255,154,46,.1);border-left:4px solid var(--orange);padding:10px 14px;margin:12px 0;font-weight:600;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%)}
+.notice.red{background:rgba(255,59,92,.12);border-left-color:var(--red)}
+
+/* ---------- Showroom / carrousel ---------- */
+.stage{--glow:var(--cyan);position:relative;display:flex;justify-content:center;align-items:flex-end;padding:18px 0 54px;min-height:220px}
+.stage::before{content:"";position:absolute;left:12%;right:12%;bottom:26px;height:46px;border-radius:50%;
+  background:radial-gradient(ellipse at center, color-mix(in srgb, var(--glow) 35%, transparent), transparent 70%);
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--glow) 40%, transparent), 0 0 30px color-mix(in srgb, var(--glow) 40%, transparent)}
+.stage.small{min-height:150px;padding:4px 0 40px}
+.bike{position:relative;width:min(80%,380px);z-index:1}
+.stage.small .bike{width:min(62%,260px)}
+.bike > svg{display:block;width:100%;height:auto;color:var(--glow);filter:drop-shadow(0 0 6px var(--glow)) drop-shadow(0 0 22px var(--glow))}
+.bike .refl{position:absolute;left:0;right:0;top:calc(100% - 22%);transform:scaleY(-1);opacity:.22;pointer-events:none;
+  -webkit-mask-image:linear-gradient(to top, #000 0%, transparent 55%);mask-image:linear-gradient(to top, #000 0%, transparent 55%)}
+.bike .refl svg{display:block;width:100%;height:auto;color:var(--glow);filter:blur(1px)}
+.bike.in-left{animation:inL .45s cubic-bezier(.2,.8,.2,1)}
+.bike.in-right{animation:inR .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes inR{from{opacity:0;transform:translateX(45%) skewX(-12deg)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-45%) skewX(12deg)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.bike.in-left,.bike.in-right{animation:none}}
+.arrow{position:absolute;top:42%;z-index:2;width:52px;height:60px;border:0;cursor:pointer;background:rgba(10,8,20,.7);color:var(--cyan);font:900 2rem/1 var(--head);
+  text-shadow:0 0 10px var(--cyan)}
+.arrow.left{left:0;clip-path:polygon(30% 0,100% 0,100% 100%,30% 100%,0 50%)}
+.arrow.right{right:0;clip-path:polygon(0 0,70% 0,100% 50%,70% 100%,0 100%)}
+.arrow:active{background:var(--cyan);color:#05040a}
+.counter{text-align:center;font:italic 800 .95rem var(--head);color:var(--muted);letter-spacing:.2em}
+.bike-name{text-align:center;font-size:clamp(2rem,10vw,2.8rem);margin:2px 0 6px}
+.bike-sub{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-weight:600}
+.hints{text-align:center;color:var(--muted);font-size:.9rem;margin-top:4px}
+.plate{display:inline-block;background:#F5C400;color:#111;font-weight:700;letter-spacing:.08em;padding:0 6px;border-radius:3px;font-size:.92rem}
+
+.odo{display:inline-flex;gap:3px;background:#000;padding:6px;border-radius:4px;box-shadow:0 0 0 1px var(--line),0 0 18px rgba(46,230,240,.15)}
+.odo span{display:inline-block;width:1.3em;text-align:center;background:linear-gradient(#1d1d26,#050508 50%,#1d1d26);color:var(--cyan);font:700 1.9rem/1.25 var(--body);border-radius:2px;text-shadow:0 0 8px rgba(46,230,240,.7)}
+.odo span.lead{color:#22323a;text-shadow:none}
+.odo-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.odo-unit{font:italic 800 1rem var(--head);color:var(--muted)}
+.reading{display:flex;gap:8px;margin:12px 0 0}
+.reading input{flex:1;min-width:0}
+
+/* ---------- Statusmeters ---------- */
+.parts{display:flex;flex-direction:column;gap:8px}
+.part{--c:var(--green);background:var(--panel);clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%);border-left:4px solid var(--c)}
+.part summary{list-style:none;cursor:pointer;padding:10px 18px 12px 12px}
+.part summary::-webkit-details-marker{display:none}
+.part-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.part-name{font:italic 800 1rem var(--head);text-transform:uppercase}
+.part-rest{color:var(--c);font-weight:700;white-space:nowrap;text-shadow:0 0 8px color-mix(in srgb, var(--c) 50%, transparent)}
+.meter{position:relative;height:12px;background:#0b0a12;margin-top:8px;overflow:hidden;transform:skewX(-20deg)}
+.meter .fill{position:absolute;inset:0 auto 0 0;background:var(--c);box-shadow:0 0 10px var(--c)}
+.meter::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 10px,#0b0a12 10px 13px)}
+.part.late .part-rest{animation:pulse 1.4s ease-in-out infinite}
+.part.late .meter{background:rgba(255,59,92,.28);box-shadow:0 0 10px rgba(255,59,92,.35)}
+@keyframes pulse{50%{opacity:.45}}
+@media (prefers-reduced-motion: reduce){.part.late .part-rest{animation:none}}
+.part-body{padding:0 18px 14px 12px;color:var(--muted);font-size:.98rem}
+.part-body dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0 0 10px}
+.part-body dd{margin:0;color:var(--text);text-align:right}
+.src{font-size:.88rem;color:var(--muted)}
+.mini{display:flex;flex-direction:column;gap:10px}
+.mini .row-m{display:grid;grid-template-columns:1fr auto;gap:2px 10px;--c:var(--green)}
+.mini .row-m .meter{grid-column:1 / -1;margin-top:0;height:9px}
+.mini .n{font-weight:700}
+.mini .r{color:var(--c);font-weight:700}
+
+/* ---------- Knoppen en formulieren ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:50px;padding:10px 22px;border:0;
+  clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  background:var(--panel2);color:var(--text);font:italic 800 1rem var(--head);text-transform:uppercase;letter-spacing:.02em;text-decoration:none;cursor:pointer}
+.btn.primary{background:linear-gradient(90deg,var(--magenta),#b14dff);color:#fff}
+.btn.cyan{background:var(--cyan);color:#05040a}
+.btn.danger{background:rgba(255,59,92,.15);color:var(--red)}
+.btn.block{width:100%}
+.btn:focus-visible{filter:brightness(1.3);outline:none;text-decoration:underline}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.btns .btn{flex:1 1 150px}
+a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,.pick input:focus-visible + *{outline:2px solid var(--cyan);outline-offset:2px}
+
+.facts dl{display:grid;grid-template-columns:auto 1fr;gap:0 16px;margin:0}
+.facts dt,.facts dd{padding:7px 0;border-bottom:1px solid var(--line);margin:0}
+.facts dt{color:var(--muted)}
+.facts dd{text-align:right;font-weight:600;overflow-wrap:anywhere}
+.facts dl > :nth-last-child(-n+2){border-bottom:0}
+.note{white-space:pre-wrap;background:var(--panel);border-left:3px dashed var(--line);padding:10px 14px;margin:8px 0}
+.list{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.sheet{display:block;background:var(--panel);clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);border-left:4px solid var(--magenta);padding:12px 20px 12px 14px;color:inherit;text-decoration:none}
+.sheet-head{display:flex;justify-content:space-between;gap:10px;font:italic 800 1rem var(--head);text-transform:uppercase}
+.sheet ul{margin:6px 0 0;padding-left:18px}
+.sheet-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:.95rem;margin-top:6px}
+.empty{text-align:center;padding:24px 12px;color:var(--muted);background:var(--panel);clip-path:var(--cut);margin:8px 0 16px}
+
+label{display:block;font-weight:700;margin:14px 0 4px}
+label .opt{color:var(--muted);font-weight:500}
+input,select,textarea{width:100%;font:inherit;font-size:1.05rem;color:var(--text);background:rgba(8,7,16,.9);border:1.5px solid var(--line);border-radius:4px;padding:10px 12px;min-height:48px}
+textarea{min-height:90px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.rows{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.row{background:var(--panel);clip-path:var(--cut);padding:10px;display:flex;flex-direction:column;gap:8px}
+.row-top{display:flex;gap:8px}
+.row-two{display:grid;grid-template-columns:1fr 112px;gap:8px}
+.icon-btn{flex:0 0 48px;height:48px;border-radius:4px;border:1.5px solid var(--line);background:transparent;color:var(--red);font-size:1.1rem;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{border:0;background:var(--panel2);color:var(--text);padding:7px 14px;font:600 .95rem var(--body);cursor:pointer;min-height:38px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.chip:active{background:var(--cyan);color:#05040a}
+.err{color:var(--red);font-weight:700;margin-top:12px}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:6px}
+.pick label{margin:0;cursor:pointer}
+.pick input{position:absolute;opacity:0;width:1px;height:1px;min-height:0}
+.pick .opt-box{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;background:var(--panel);clip-path:var(--cut);font-weight:700;font-size:.92rem;color:var(--muted)}
+.pick .opt-box svg{width:76px;height:auto;color:var(--muted)}
+.pick input:checked + .opt-box{background:rgba(46,230,240,.16);color:var(--text)}
+.pick input:checked + .opt-box svg{color:var(--cyan);filter:drop-shadow(0 0 4px var(--cyan))}
+.swatches{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.swatches label{margin:0;cursor:pointer}
+.swatches input{position:absolute;opacity:0;width:1px;height:1px;min-height:0}
+.swatches span{display:block;width:40px;height:40px;border-radius:50%;background:var(--s);box-shadow:0 0 10px var(--s);border:3px solid transparent}
+.swatches input:checked + span{border-color:#fff}
+.iv{background:var(--panel);clip-path:var(--cut);padding:10px 12px}
+.iv-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font:italic 800 1rem var(--head);text-transform:uppercase}
+.iv .grid2 label{margin-top:8px;font-size:.95rem}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--cyan);color:#05040a;padding:10px 20px;font:italic 800 .95rem var(--head);text-transform:uppercase;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+
+/* ---------- Intro ---------- */
+#intro{position:fixed;inset:0;z-index:50;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;overflow:hidden;
+  padding:env(safe-area-inset-top,0px) 20px env(safe-area-inset-bottom,0px)}
+#intro[hidden]{display:none}
+#intro .streak{position:absolute;height:2px;width:45%;left:-50%;background:linear-gradient(90deg,transparent,var(--c),#fff);box-shadow:0 0 12px var(--c);animation:streak 1.8s cubic-bezier(.3,0,.2,1) infinite}
+#intro .s1{--c:var(--cyan);top:30%}
+#intro .s2{--c:var(--magenta);top:62%;animation-delay:.6s;width:60%}
+#intro .s3{--c:var(--cyan);top:74%;animation-delay:1.1s;width:30%}
+@keyframes streak{to{left:120%}}
+#intro .chrome{font-size:clamp(3.6rem,19vw,6rem);animation:neonOn 1.2s steps(1,end) both .2s}
+@keyframes neonOn{0%{opacity:0}10%{opacity:1}16%{opacity:.1}24%{opacity:1}30%{opacity:.3}36%,100%{opacity:1}}
+#intro .tag{font:italic 700 1rem var(--head);color:var(--magenta);letter-spacing:.3em;text-transform:uppercase;text-shadow:0 0 10px var(--magenta);animation:fadeIn .6s both 1s}
+#intro .press{margin-top:38px;font:italic 800 1.05rem var(--head);text-transform:uppercase;letter-spacing:.2em;color:var(--text);animation:fadeIn .4s both 1.4s, blink 1.1s steps(2,start) infinite 1.8s}
+@keyframes blink{to{visibility:hidden}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#intro.go{animation:introOut .55s ease-in forwards}
+@keyframes introOut{0%{filter:brightness(1)}20%{filter:brightness(3)}100%{opacity:0;transform:scale(1.15)}}
+@media (prefers-reduced-motion: reduce){
+  #intro .streak{display:none} #intro .chrome,#intro .tag{animation:none} #intro .press{animation:none;opacity:1} #intro.go{animation:none;opacity:0}
+}
+
+/* ---------- Uitdraai ---------- */
+#print{display:none}
+@media print{
+  html,body{background:#fff !important;color:#000;font-family:Arial, sans-serif;font-size:10.5pt}
+  :root{padding:0}
+  body::before,.bar,main,.toast,.scene,#intro{display:none !important}
+  #print{display:block}
+  @page{margin:15mm 14mm}
+  .p-title{font-size:20pt;margin:0}
+  .p-sub{color:#444;margin:2px 0 12px}
+  .p-facts{width:100%;border-collapse:collapse;margin-bottom:10px}
+  .p-facts td{padding:3px 6px;border-bottom:1px solid #bbb;vertical-align:top}
+  .p-facts td:first-child{width:38%;color:#444}
+  .p-sheet{break-inside:avoid;page-break-inside:avoid;border:1px solid #888;border-radius:4px;padding:8px 10px;margin:10px 0}
+  .p-sheet h3{margin:0 0 4px;font-size:12pt;display:flex;justify-content:space-between}
+  .p-rows{width:100%;border-collapse:collapse;margin-top:4px}
+  .p-rows th,.p-rows td{text-align:left;padding:3px 5px;border-bottom:1px solid #ccc;vertical-align:top}
+  .p-rows th{font-weight:700;border-bottom:1.5px solid #555}
+  .p-rows .num{text-align:right;white-space:nowrap}
+  .p-note{white-space:pre-wrap;margin:6px 0 0;font-style:italic}
+  .p-total{margin-top:14px;font-weight:700;text-align:right}
+  .p-h2{font-size:14pt;margin:18px 0 6px;break-after:avoid}
+}
+</style>
+</head>
+<body>
+<div class="scene" aria-hidden="true">
+  <span class="tube t1"></span><span class="tube t2"></span><span class="tube v t3"></span><span class="tube v t4"></span>
+  <div class="floor"></div><div class="wet"></div><div class="horizon"></div>
+</div>
+<div id="intro" hidden role="button" tabindex="0" aria-label="Tik om te starten">
+  <span class="streak s1"></span><span class="streak s2"></span><span class="streak s3"></span>
+  <div class="chrome">Garage</div>
+  <div class="tag">Onderhoud en status</div>
+  <div class="press">Tik om te starten</div>
+</div>
+<header class="bar" id="bar">
+  <a class="back" id="back" href="#/" data-sfx="back" hidden>‹ Terug</a>
+  <h1 id="title" class="chrome">Garage</h1>
+</header>
+<main id="app"></main>
+<div id="print"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="importFile" accept="application/json,.json" hidden>
+
+<script>
+const KEY = 'onderhoudsboekje-v1';
+const app = document.getElementById('app');
+
+/* ---------- Motortypes en icoontjes (eigen lijntekeningen) ---------- */
+const TYPES = [
+  {id:'naked', label:'Naked', w:[[28,52,14],[92,52,14]],
+   d:'M28 52 L46 40 L70 40 L92 52 M38 32 L56 32 Q60 24 72 26 L80 30 L92 52 M76 21 L86 17 M86 33 a3.5 3.5 0 1 0 .1 0'},
+  {id:'adventure', label:'Adventure', w:[[28,52,14],[94,51,15]],
+   d:'M28 52 L48 38 L72 38 L94 51 M36 30 L56 30 L62 24 L76 24 L83 31 L94 51 M80 14 L85 28 M86 31 L98 35 M44 30 L40 21 L28 21 M30 42 L44 42'},
+  {id:'sport', label:'Sport', w:[[28,52,14],[92,52,14]],
+   d:'M28 52 L46 41 L74 41 L92 52 M34 32 L50 30 L60 26 L74 28 L88 35 L84 43 L74 41 M74 28 L82 21 M50 30 L58 38 L74 41'},
+  {id:'toer', label:'Toer', w:[[28,52,14],[92,52,14]],
+   d:'M28 52 L48 41 L74 41 L92 52 M38 32 L58 32 L64 26 L76 26 L89 31 L86 41 M81 26 L85 12 M18 30 H36 V18 H18 Z M20 42 H40'},
+  {id:'cruiser', label:'Cruiser', w:[[24,54,13],[100,54,13]],
+   d:'M24 54 L50 45 L76 43 L100 54 M32 39 L50 41 L58 35 L72 35 L76 39 L100 54 M72 24 L80 21 L86 28 M80 21 L76 36'},
+  {id:'enduro', label:'Enduro', w:[[28,52,14],[94,51,15]],
+   d:'M28 52 L48 36 L70 38 L94 51 M36 29 L60 27 L72 30 L94 51 M86 25 L101 31 M20 33 L36 28 M70 21 L81 19'},
+  {id:'klassiek', label:'Klassiek', w:[[28,52,14],[92,52,14]],
+   d:'M28 52 L48 42 L72 42 L92 52 M36 34 L54 34 Q62 25 74 29 L80 34 L92 52 M76 23 L86 21 M88 36 a4.5 4.5 0 1 0 .1 0 M50 42 L50 48 L62 48 L62 42'},
+  {id:'scooter', label:'Scooter', w:[[30,56,10],[90,56,10]],
+   d:'M30 56 L40 44 L74 44 L82 30 L90 56 M34 36 L58 36 Q62 44 74 44 M82 30 L80 18 L90 16 M20 44 L40 44'}
+];
+function bikeSvg(type){
+  const t = TYPES.find(x => x.id === type) || TYPES[0];
+  const wheels = t.w.map(([x,y,r]) => `<circle cx="${x}" cy="${y}" r="${r}"/><circle cx="${x}" cy="${y}" r="${Math.round(r*0.28)}"/>`).join('');
+  return `<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${wheels}<path d="${t.d}"/></svg>`;
+}
+const GLOWS = ['#2EE6F0','#FF2BD6','#39FF88','#FFE14D','#FF7A1A','#8B5CFF','#FF3B5C','#F2F2FF'];
+
+/* ---------- Onderhoudsintervallen ---------- */
+// Ténéré 700 (2019-2024), Europees schema uit het instructieboekje. Remblokken, banden, ketting+tandwielen en accu staan
+// niet als interval in het boekje: die zijn een schatting.
+const PRESETS = {
+  tenere: {label:'Yamaha Ténéré 700 (2019–2024), instructieboekje', items:[
+    ['Motorolie',10000,12,'boekje'], ['Oliefilter',20000,null,'boekje'], ['Luchtfilter',20000,null,'boekje'],
+    ['Bougies',20000,null,'boekje'], ['Kleppen controleren',40000,null,'boekje'], ['Remvloeistof',null,24,'boekje'],
+    ['Remslangen',null,48,'boekje'], ['Koelvloeistof',null,36,'boekje'], ['Ketting smeren',1000,null,'boekje'],
+    ['Ketting & tandwielen',25000,null,'schatting'], ['Remblokken voor',15000,null,'schatting'],
+    ['Remblokken achter',20000,null,'schatting'], ['Band voor',12000,60,'schatting'], ['Band achter',8000,60,'schatting'],
+    ['Accu',null,48,'schatting']
+  ]},
+  standaard: {label:'Standaardlijst (schatting, zelf aanpassen)', items:[
+    ['Motorolie',6000,12,'schatting'], ['Oliefilter',12000,12,'schatting'], ['Luchtfilter',12000,null,'schatting'],
+    ['Bougies',12000,null,'schatting'], ['Kleppen controleren',24000,null,'schatting'], ['Remvloeistof',null,24,'schatting'],
+    ['Koelvloeistof',null,24,'schatting'], ['Ketting smeren',800,null,'schatting'], ['Ketting & tandwielen',20000,null,'schatting'],
+    ['Remblokken voor',12000,null,'schatting'], ['Remblokken achter',15000,null,'schatting'],
+    ['Band voor',12000,60,'schatting'], ['Band achter',9000,60,'schatting'], ['Accu',null,48,'schatting']
+  ]}
+};
+const EXTRA_CATS = ['Grote beurt','Kleine beurt','Vering','Elektra','Overig'];
+function presetItems(key){
+  return PRESETS[key].items.map(([naam,km,mnd,bron]) => ({id:uid(), naam, km, mnd, bron, startKm:null, startDatum:null}));
+}
+const guessPreset = m => /t[eé]n[eé]r[eé]\s*700|xtz\s*690|\bt7\b/i.test(`${m.merk} ${m.model}`) ? 'tenere' : 'standaard';
+
+/* ---------- Opslag ---------- */
+let data = load();
+function migrate(d){
+  d.version = 3;
+  d.settings = Object.assign({sound:true, lastMotor:null}, d.settings || {});
+  d.motors.forEach(m => {
+    m.sheets = m.sheets || [];
+    m.readings = m.readings || [];
+    m.type = m.type || 'naked';
+    m.glow = m.glow || GLOWS[0];
+    if(m.kmPerMaand === undefined) m.kmPerMaand = null;
+    if(!Array.isArray(m.intervals)) m.intervals = presetItems(guessPreset(m));
+  });
+  return d;
+}
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    const d = raw ? JSON.parse(raw) : null;
+    if(d && Array.isArray(d.motors)) return migrate(d);
+  }catch(e){}
+  return migrate({motors:[], lastBackup:null});
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(data)); return true; }
+  catch(e){ alert('Opslaan is mislukt. Mogelijk is de opslag van je browser vol of uitgeschakeld (privévenster). Maak direct een back-up.'); return false; }
+}
+
+/* ---------- Geluid (zelf gegenereerd, geen bestanden) ---------- */
+const Sfx = {
+  ctx:null,
+  enabled(){ return data.settings.sound !== false; },
+  init(){
+    if(!this.ctx){ const AC = window.AudioContext || window.webkitAudioContext; if(AC) try{ this.ctx = new AC(); }catch(e){} }
+    if(this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  tone(f, dur, {type='square', vol=.04, to=null, delay=0} = {}){
+    if(!this.enabled() || !this.ctx) return;
+    const c = this.ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if(to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .02);
+  },
+  noise(dur, {from=400, to=4000, vol=.12, delay=0} = {}){
+    if(!this.enabled() || !this.ctx) return;
+    const c = this.ctx, t = c.currentTime + delay, len = Math.floor(c.sampleRate * dur);
+    const buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for(let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const s = c.createBufferSource(); s.buffer = buf;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2;
+    f.frequency.setValueAtTime(from, t); f.frequency.exponentialRampToValueAtTime(to, t + dur);
+    const g = c.createGain(); g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + dur * .4); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(c.destination); s.start(t); s.stop(t + dur);
+  },
+  select(){ this.tone(740, .06, {vol:.035}); this.tone(1110, .09, {vol:.035, delay:.055}); },
+  back(){ this.tone(520, .12, {type:'triangle', vol:.06, to:260}); },
+  whoosh(){ this.noise(.35, {from:300, to:3200, vol:.14}); },
+  intro(){
+    this.noise(.9, {from:150, to:5000, vol:.18});
+    [220, 277, 330, 440].forEach((f,i) => this.tone(f, .7, {type:'sawtooth', vol:.022, delay:.25 + i*.07}));
+  }
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('a, button, summary, .chip, .pick label, .swatches label');
+  if(!el || el.disabled) return;
+  Sfx.init();
+  const kind = el.dataset.sfx;
+  if(kind === 'none') return;
+  if(kind === 'back') Sfx.back();
+  else Sfx.select();
+}, true);
+
+/* ---------- Hulpfuncties ---------- */
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset()*6e4).toISOString().slice(0,10); };
+const fmtKm = n => (n || n === 0) ? Math.round(n).toLocaleString('nl-NL') : '–';
+const fmtEur = n => Number(n || 0).toLocaleString('nl-NL',{style:'currency',currency:'EUR'});
+const toDate = iso => { const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); };
+const fmtDate = iso => iso ? toDate(iso).toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'}) : '–';
+const fmtMonth = dt => dt.toLocaleDateString('nl-NL',{month:'short',year:'numeric'});
+const monthsBetween = (a, b) => (b - a) / (864e5 * 30.4375);
+function addMonths(iso, n){ const d = toDate(iso); return new Date(d.getFullYear(), d.getMonth() + n, d.getDate()); }
+function parseKm(v){ const s = String(v ?? '').replace(/\D/g,''); return s ? parseInt(s,10) : null; }
+function parseMoney(v){
+  let s = String(v ?? '').trim().replace(/[€\s]/g,'');
+  if(!s) return null;
+  if(s.includes(',')) s = s.replace(/\./g,'').replace(',', '.');
+  const n = parseFloat(s);
+  return isNaN(n) ? null : Math.round(n*100)/100;
+}
+const round50 = n => Math.round(n / 50) * 50;
+const motorName = m => [m.merk, m.model].filter(Boolean).join(' ') || 'Naamloze motor';
+const findMotor = id => data.motors.find(m => m.id === id);
+const currentMotor = () => findMotor(data.settings.lastMotor) || data.motors[0] || null;
+const sheetCost = s => s.regels.reduce((t,r) => t + (r.kosten || 0), 0);
+const motorCost = m => m.sheets.reduce((t,s) => t + sheetCost(s), 0);
+function sortedSheets(m, asc){
+  const arr = [...m.sheets].sort((a,b) => (a.datum||'').localeCompare(b.datum||'') || (a.teller||0) - (b.teller||0));
+  return asc ? arr : arr.reverse();
+}
+function points(m){
+  return [{d:m.aanschafdatum, k:m.teller}, ...m.sheets.map(s => ({d:s.datum, k:s.teller})), ...m.readings.map(r => ({d:r.datum, k:r.teller}))]
+    .filter(p => p.d && p.k != null).sort((a,b) => a.d.localeCompare(b.d) || a.k - b.k);
+}
+const currentKm = m => Math.max(0, ...points(m).map(p => p.k));
+function kmRate(m){
+  if(m.kmPerMaand) return {v:m.kmPerMaand, how:'zelf ingesteld'};
+  const p = points(m);
+  if(p.length >= 2){
+    const first = p[0], last = p[p.length-1];
+    const mo = monthsBetween(toDate(first.d), toDate(last.d));
+    if(mo >= 1 && last.k > first.k) return {v:Math.round((last.k - first.k) / mo), how:'berekend uit je tellerstanden'};
+  }
+  return {v:500, how:'aanname, nog te weinig gegevens'};
+}
+
+/* ---------- Status per onderdeel ---------- */
+function lastDone(m, item){
+  const hits = sortedSheets(m, false).filter(s => s.regels.some(r => r.categorie === item.naam));
+  if(hits.length) return {km:hits[0].teller, datum:hits[0].datum, via:'velletje ' + fmtDate(hits[0].datum)};
+  if(item.startKm != null || item.startDatum) return {km:item.startKm ?? m.teller, datum:item.startDatum || m.aanschafdatum, via:'opgegeven startpunt'};
+  return {km:m.teller, datum:m.aanschafdatum, via:'aanschaf (nog niet in het boekje)'};
+}
+const LEVELS = {
+  green:{c:'var(--green)', label:'In orde'}, yellow:{c:'var(--yellow)', label:'Halverwege'},
+  orange:{c:'var(--orange)', label:'Komt eraan'}, red:{c:'var(--red)', label:'Bijna'}, late:{c:'var(--red)', label:'Over tijd'}
+};
+const RANK = {late:0, red:1, orange:2, yellow:3, green:4};
+function itemStatus(m, item){
+  if(!item.km && !item.mnd) return null;
+  const cur = currentKm(m), rate = kmRate(m).v, ld = lastDone(m, item);
+  let fr = Infinity, rem = Infinity, by = null, dueKm = null, dueDate = null, remMonths = null;
+  if(item.km){
+    dueKm = ld.km + item.km;
+    rem = dueKm - cur; fr = rem / item.km; by = 'km';
+  }
+  if(item.mnd && ld.datum){
+    dueDate = addMonths(ld.datum, item.mnd);
+    remMonths = monthsBetween(new Date(), dueDate);
+    const remT = remMonths * rate, frT = remMonths / item.mnd;
+    if(frT < fr){ fr = frT; by = 'tijd'; }
+    rem = Math.min(rem, remT);
+  }
+  const level = fr <= 0 ? 'late' : fr < .1 ? 'red' : fr < .25 ? 'orange' : fr < .5 ? 'yellow' : 'green';
+  return {ld, dueKm, dueDate, remMonths, rem, fr, by, level, pct:Math.max(0, Math.min(100, fr*100))};
+}
+function restText(st){
+  const approx = st.by === 'tijd' ? '± ' : '';
+  if(st.level === 'late'){
+    if(st.by === 'tijd') return `${Math.max(1, Math.round(-st.remMonths))} mnd over tijd`;
+    return `${fmtKm(Math.abs(st.rem))} km over tijd`;
+  }
+  return `nog ${approx}${fmtKm(st.by === 'tijd' ? round50(st.rem) : st.rem)} km`;
+}
+const statusList = m => m.intervals.map(i => ({i, st:itemStatus(m, i)})).filter(x => x.st).sort((a,b) => a.st.fr - b.st.fr);
+function motorStatus(m){
+  const list = statusList(m);
+  return {late:list.filter(x => x.st.level === 'late').length,
+          soon:list.filter(x => x.st.level === 'red' || x.st.level === 'orange').length};
+}
+function statusLine(m){
+  const ms = motorStatus(m);
+  return ms.late ? `${ms.late} over tijd` : ms.soon ? `${ms.soon} komt eraan` : 'Alles in orde';
+}
+
+/* ---------- Algemeen ---------- */
+function setBar(title, backHref){
+  const bar = document.getElementById('bar');
+  bar.hidden = !title;
+  document.getElementById('title').textContent = title || '';
+  document.title = title ? title + ' | Garage' : 'Garage';
+  const b = document.getElementById('back');
+  if(backHref){ b.hidden = false; b.href = backHref; } else b.hidden = true;
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+const go = path => { location.hash = '#/' + path; };
+const fact = (k, v) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`;
+const doorText = s => s.door === 'garage' ? (s.garage ? 'Garage: ' + s.garage : 'Garage') : 'Zelf gedaan';
+const typeLabel = id => (TYPES.find(t => t.id === id) || TYPES[0]).label;
+const mi = (href, lbl, sub, extra = '') => `<a class="mi" href="${href}" ${extra}><span class="lbl">${esc(lbl)}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</a>`;
+const mb = (id, lbl, sub, extra = '') => `<button class="mi" id="${id}" type="button" ${extra}><span class="lbl">${esc(lbl)}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</button>`;
+function stage(m, opts = {}){
+  return `<div class="stage${opts.small ? ' small' : ''}" style="--glow:${esc(m.glow)}" id="stage">
+    ${opts.arrows ? '<button class="arrow left" id="prev" data-sfx="none" aria-label="Vorige motor">‹</button>' : ''}
+    <div class="bike ${opts.anim || ''}">${bikeSvg(m.type)}<div class="refl">${bikeSvg(m.type)}</div></div>
+    ${opts.arrows ? '<button class="arrow right" id="next" data-sfx="none" aria-label="Volgende motor">›</button>' : ''}
+  </div>`;
+}
+
+/* ---------- Routes ---------- */
+let slideDir = 0, menuAnimated = false;
+function route(){
+  const p = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
+  window.scrollTo(0,0);
+  if(p[0] === 'garage') return viewCarousel(currentMotor());
+  if(p[0] === 'motor' && p[1] === 'new') return viewMotorForm(null);
+  if(p[0] === 'motor' && p[1]){
+    const m = findMotor(p[1]);
+    if(!m) return go('');
+    if(data.settings.lastMotor !== m.id){ data.settings.lastMotor = m.id; save(); }
+    if(p[2] === 'status') return viewStatus(m);
+    if(p[2] === 'edit') return viewMotorForm(m);
+    if(p[2] === 'intervallen') return viewIntervals(m);
+    if(p[2] === 'boekje') return viewBoekje(m);
+    if(p[2] === 'sheet' && p[3] === 'new') return viewSheetForm(m, null, p[4]);
+    if(p[2] === 'sheet' && p[3]){
+      const s = m.sheets.find(x => x.id === p[3]);
+      return s ? viewSheetForm(m, s) : go('motor/' + m.id + '/boekje');
+    }
+    return viewCarousel(m);
+  }
+  viewHome();
+}
+window.addEventListener('hashchange', route);
+
+/* ---------- Hoofdmenu ---------- */
+function viewHome(){
+  setBar(null, null);
+  const m = currentMotor();
+  const days = data.lastBackup ? Math.floor((Date.now() - new Date(data.lastBackup)) / 864e5) : null;
+  const needBackup = data.motors.length && (days === null || days > 30);
+  const n = data.motors.length;
+  app.innerHTML = `
+    <div class="title-block"><div class="chrome">Garage</div><div class="tag">Onderhoud en status</div></div>
+    ${m ? stage(m, {small:true}) : ''}
+    ${m && motorStatus(m).late ? `<div class="notice red">${esc(motorName(m))}: ${motorStatus(m).late} onderdelen over tijd</div>` : ''}
+    <nav class="menu${menuAnimated ? '' : ' intro-anim'}" aria-label="Hoofdmenu">
+      ${mi('#/garage', 'Garage', n ? `${n} ${n === 1 ? 'motor' : 'motoren'}` : 'leeg')}
+      ${m ? mi(`#/motor/${m.id}/status`, 'Status', statusLine(m)) : mb('x1', 'Status', '', 'disabled')}
+      ${m ? mi(`#/motor/${m.id}/boekje`, 'Onderhoudsboekje', '') : mb('x2', 'Onderhoudsboekje', '', 'disabled')}
+      ${m ? mi(`#/motor/${m.id}/sheet/new`, 'Nieuw velletje', '') : mb('x3', 'Nieuw velletje', '', 'disabled')}
+      ${mi('#/motor/new', 'Motor toevoegen', '')}
+      ${mb('exp', 'Back-up opslaan', data.lastBackup ? fmtDate(data.lastBackup.slice(0,10)) : 'nog nooit')}
+      ${mb('imp', 'Back-up terugzetten', '')}
+      ${mb('snd', 'Geluid', data.settings.sound !== false ? 'aan' : 'uit')}
+    </nav>
+    ${needBackup ? `<div class="notice">${days === null ? 'Nog geen back-up gemaakt.' : `Laatste back-up is ${days} dagen oud.`} Je gegevens staan alleen in deze browser.</div>` : ''}`;
+  menuAnimated = true;
+  document.getElementById('exp').onclick = exportData;
+  document.getElementById('imp').onclick = () => document.getElementById('importFile').click();
+  document.getElementById('snd').onclick = () => {
+    data.settings.sound = data.settings.sound === false;
+    save(); if(data.settings.sound) Sfx.select();
+    viewHome();
+  };
+}
+
+/* ---------- Garage: carrousel ---------- */
+function odometer(km){
+  const s = String(Math.round(km || 0)).padStart(6, '0');
+  const first = s.search(/[1-9]/);
+  return `<span class="odo" aria-label="${fmtKm(km)} kilometer">${[...s].map((d,i) =>
+    `<span class="${(first === -1 ? i < s.length-1 : i < first) ? 'lead' : ''}" aria-hidden="true">${d}</span>`).join('')}</span>`;
+}
+function meterHtml(st, label){
+  return `<div class="meter" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(st.pct)}" aria-label="${esc(label)}: ${LEVELS[st.level].label}"><div class="fill" style="width:${st.pct}%"></div></div>`;
+}
+function viewCarousel(m){
+  setBar('Garage', '#/');
+  if(!m){
+    app.innerHTML = `<div class="empty"><p>Je garage is nog leeg.</p><p>Zet je eerste motor erin.</p></div>
+      <nav class="menu">${mi('#/motor/new', 'Motor toevoegen', '')}</nav>`;
+    return;
+  }
+  const n = data.motors.length, idx = data.motors.indexOf(m);
+  const anim = slideDir > 0 ? 'in-right' : slideDir < 0 ? 'in-left' : '';
+  slideDir = 0;
+  const top = statusList(m).slice(0, 3);
+  app.innerHTML = `
+    ${n > 1 ? `<div class="counter">${idx + 1} / ${n}</div>` : ''}
+    ${stage(m, {arrows:n > 1, anim})}
+    <div class="chrome bike-name">${esc(motorName(m))}</div>
+    <div class="bike-sub">${m.kenteken ? `<span class="plate">${esc(m.kenteken)}</span>` : ''}<span>${esc(typeLabel(m.type))}</span>${m.bouwjaar ? `<span>${esc(m.bouwjaar)}</span>` : ''}</div>
+    ${n > 1 ? '<div class="hints">Veeg of gebruik de pijlen om te wisselen</div>' : ''}
+
+    <div class="hud">
+      <div class="hud-title">Kilometerstand</div>
+      <div class="odo-row">${odometer(currentKm(m))}<span class="odo-unit">km</span></div>
+      <div class="reading">
+        <input id="r-km" inputmode="numeric" placeholder="Nieuwe stand" aria-label="Nieuwe tellerstand in km">
+        <button class="btn cyan" id="r-save">Bijwerken</button>
+      </div>
+    </div>
+
+    ${top.length ? `<div class="hud"><div class="hud-title">Conditie</div><div class="mini">${top.map(({i, st}) => `
+      <div class="row-m" style="--c:${LEVELS[st.level].c}"><span class="n">${esc(i.naam)}</span><span class="r">${restText(st)}</span>${meterHtml(st, i.naam)}</div>`).join('')}
+    </div></div>` : ''}
+
+    <nav class="menu" aria-label="Motormenu">
+      ${mi(`#/motor/${m.id}/status`, 'Status', statusLine(m))}
+      ${mi(`#/motor/${m.id}/boekje`, 'Onderhoudsboekje', `${m.sheets.length} ${m.sheets.length === 1 ? 'velletje' : 'velletjes'}`)}
+      ${mi(`#/motor/${m.id}/sheet/new`, 'Nieuw velletje', '')}
+      ${mi(`#/motor/${m.id}/intervallen`, 'Intervallen', '')}
+      ${mi(`#/motor/${m.id}/edit`, 'Gegevens en uiterlijk', '')}
+    </nav>`;
+
+  const shift = dir => {
+    slideDir = dir; Sfx.init(); Sfx.whoosh();
+    const next = data.motors[(idx + dir + n) % n];
+    location.replace('#/motor/' + next.id);
+  };
+  if(n > 1){
+    document.getElementById('prev').onclick = () => shift(-1);
+    document.getElementById('next').onclick = () => shift(1);
+    const st = document.getElementById('stage');
+    let x0 = null, y0 = null;
+    st.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, {passive:true});
+    st.addEventListener('touchend', e => {
+      if(x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+      x0 = null;
+      if(Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) shift(dx < 0 ? 1 : -1);
+    });
+  }
+  document.getElementById('r-save').onclick = () => {
+    const km = parseKm(document.getElementById('r-km').value);
+    if(km === null){ toast('Vul een tellerstand in'); return; }
+    if(km < currentKm(m) && !confirm(`${fmtKm(km)} km is lager dan de laatst bekende stand (${fmtKm(currentKm(m))} km). Toch opslaan?`)) return;
+    m.readings.push({datum:today(), teller:km});
+    if(save()){ toast('Tellerstand bijgewerkt'); viewCarousel(m); }
+  };
+}
+
+/* ---------- Status ---------- */
+function viewStatus(m){
+  setBar('Status', '#/motor/' + m.id);
+  const rate = kmRate(m);
+  const list = statusList(m);
+  const ms = motorStatus(m);
+  app.innerHTML = `
+    <h2>${esc(motorName(m))}</h2>
+    <p class="muted small">${fmtKm(currentKm(m))} km. Gemiddeld ${fmtKm(rate.v)} km per maand (${esc(rate.how)}).</p>
+    ${ms.late ? `<div class="notice red">${ms.late} ${ms.late === 1 ? 'onderdeel is' : 'onderdelen zijn'} over tijd</div>` : ''}
+    ${list.length ? `<div class="parts">${list.map(({i, st}) => `
+      <details class="part${st.level === 'late' ? ' late' : ''}" style="--c:${LEVELS[st.level].c}">
+        <summary>
+          <div class="part-top"><span class="part-name">${esc(i.naam)}</span><span class="part-rest">${restText(st)}</span></div>
+          ${meterHtml(st, i.naam)}
+        </summary>
+        <div class="part-body">
+          <dl>
+            <dt>Interval</dt><dd>${[i.km ? fmtKm(i.km) + ' km' : '', i.mnd ? i.mnd + ' maanden' : ''].filter(Boolean).join(' of ')}</dd>
+            <dt>Laatst gedaan</dt><dd>${fmtKm(st.ld.km)} km, ${fmtDate(st.ld.datum)}</dd>
+            ${st.dueKm != null ? `<dt>Volgende op km</dt><dd>bij ${fmtKm(st.dueKm)} km</dd>` : ''}
+            ${st.dueDate ? `<dt>Volgende op tijd</dt><dd>uiterlijk ${fmtMonth(st.dueDate)}</dd>` : ''}
+          </dl>
+          <p class="src">Bron: ${i.bron === 'boekje' ? 'instructieboekje' : i.bron === 'eigen' ? 'eigen interval' : 'schatting'}. Startpunt: ${esc(st.ld.via)}.</p>
+          <a class="btn primary block" href="#/motor/${m.id}/sheet/new/${encodeURIComponent(i.naam)}">Gedaan, noteer in boekje</a>
+        </div>
+      </details>`).join('')}</div>`
+    : `<div class="empty">Geen intervallen ingesteld.</div>`}
+    <nav class="menu">${mi(`#/motor/${m.id}/intervallen`, 'Intervallen aanpassen', '')}</nav>`;
+}
+
+/* ---------- Onderhoudsboekje ---------- */
+function viewBoekje(m){
+  setBar('Onderhoudsboekje', '#/motor/' + m.id);
+  const sheets = sortedSheets(m, false);
+  app.innerHTML = `
+    <h2>${esc(motorName(m))}</h2>
+    <nav class="menu">
+      ${mi(`#/motor/${m.id}/sheet/new`, 'Nieuw velletje', '')}
+      ${mb('print-btn', 'Uitdraai maken', 'PDF')}
+    </nav>
+    <div class="hud facts"><div class="hud-title">Aanschaf</div><dl>
+      ${fact('Merk en model', motorName(m))}
+      ${fact('Type', typeLabel(m.type))}
+      ${m.bouwjaar ? fact('Bouwjaar', m.bouwjaar) : ''}
+      ${m.kenteken ? fact('Kenteken', m.kenteken) : ''}
+      ${m.vin ? fact('Framenummer', m.vin) : ''}
+      ${fact('Aanschafdatum', fmtDate(m.aanschafdatum))}
+      ${fact('Tellerstand bij aanschaf', fmtKm(m.teller) + ' km')}
+      ${m.waarde != null ? fact('Aanschafwaarde', fmtEur(m.waarde)) : ''}
+      ${fact('Onderhoudskosten totaal', fmtEur(motorCost(m)))}
+    </dl></div>
+    ${m.opmerkingen ? `<div class="note">${esc(m.opmerkingen)}</div>` : ''}
+    <h3>Velletjes</h3>
+    ${sheets.length ? `<div class="list">${sheets.map(s => `
+      <a class="sheet" href="#/motor/${m.id}/sheet/${s.id}">
+        <div class="sheet-head"><span>${fmtDate(s.datum)}</span><span>${fmtKm(s.teller)} km</span></div>
+        <ul>${s.regels.map(r => `<li>${esc(r.omschrijving || r.categorie)}</li>`).join('')}</ul>
+        <div class="sheet-foot"><span>${esc(doorText(s))}</span><span>${sheetCost(s) ? fmtEur(sheetCost(s)) : ''}</span></div>
+      </a>`).join('')}</div>`
+    : `<div class="empty">Nog geen onderhoud genoteerd. Maak een nieuw velletje aan na je eerste beurt.</div>`}`;
+  document.getElementById('print-btn').onclick = () => printMotor(m);
+}
+
+/* ---------- Gegevens en uiterlijk ---------- */
+function viewMotorForm(m){
+  const isNew = !m;
+  m = m || {merk:'',model:'',bouwjaar:'',kenteken:'',vin:'',aanschafdatum:today(),teller:null,waarde:null,opmerkingen:'',type:'adventure',glow:GLOWS[0],kmPerMaand:null};
+  setBar(isNew ? 'Nieuwe motor' : 'Gegevens', isNew ? '#/' : '#/motor/' + m.id);
+  const autoRate = isNew ? null : kmRate({...m, kmPerMaand:null}).v;
+  app.innerHTML = `
+    <h2>${isNew ? 'Eerste pagina' : esc(motorName(m))}</h2>
+    <p class="muted">Velden met * zijn verplicht.</p>
+    <div class="grid2">
+      <div><label for="f-merk">Merk *</label><input id="f-merk" value="${esc(m.merk)}" autocomplete="off"></div>
+      <div><label for="f-model">Model *</label><input id="f-model" value="${esc(m.model)}" autocomplete="off"></div>
+      <div><label for="f-bouwjaar">Bouwjaar</label><input id="f-bouwjaar" inputmode="numeric" value="${esc(m.bouwjaar)}"></div>
+      <div><label for="f-kenteken">Kenteken</label><input id="f-kenteken" value="${esc(m.kenteken)}" autocapitalize="characters"></div>
+    </div>
+    <label for="f-vin">Framenummer (VIN) <span class="opt">optioneel</span></label>
+    <input id="f-vin" value="${esc(m.vin)}" autocapitalize="characters">
+    <div class="grid2">
+      <div><label for="f-datum">Aanschafdatum *</label><input id="f-datum" type="date" value="${esc(m.aanschafdatum)}"></div>
+      <div><label for="f-teller">Tellerstand (km) *</label><input id="f-teller" inputmode="numeric" value="${m.teller ?? ''}"></div>
+    </div>
+    <label for="f-waarde">Aanschafwaarde (€) <span class="opt">optioneel</span></label>
+    <input id="f-waarde" inputmode="decimal" value="${m.waarde != null ? String(m.waarde).replace('.', ',') : ''}">
+    <label for="f-opm">Opmerkingen</label>
+    <textarea id="f-opm" placeholder="Bijv. eerste eigenaar, accessoires, bekende gebreken">${esc(m.opmerkingen)}</textarea>
+
+    <h3>Uiterlijk in de garage</h3>
+    <label>Type motor</label>
+    <div class="pick" role="radiogroup" aria-label="Type motor">${TYPES.map(t => `
+      <label><input type="radio" name="type" value="${t.id}"${t.id === m.type ? ' checked' : ''}><span class="opt-box">${bikeSvg(t.id)}${t.label}</span></label>`).join('')}</div>
+    <label>Kleur van de neon</label>
+    <div class="swatches" role="radiogroup" aria-label="Neonkleur">${GLOWS.map(g => `
+      <label><input type="radio" name="glow" value="${g}"${g === m.glow ? ' checked' : ''} aria-label="Kleur ${g}"><span style="--s:${g}"></span></label>`).join('')}</div>
+
+    <h3>Rijgedrag</h3>
+    <label for="f-rate">Kilometers per maand <span class="opt">optioneel</span></label>
+    <input id="f-rate" inputmode="numeric" value="${m.kmPerMaand ?? ''}" placeholder="${autoRate ? 'Automatisch: ' + fmtKm(autoRate) : 'Leeg = automatisch berekenen'}">
+    <p class="muted small">Hiermee rekent de app tijdsintervallen (zoals remvloeistof elke 2 jaar) om naar verwachte kilometers. Laat leeg om het te berekenen uit je tellerstanden.</p>
+
+    ${isNew ? `<label for="f-preset">Onderhoudsintervallen</label>
+      <select id="f-preset">${Object.entries(PRESETS).map(([k,p]) => `<option value="${k}">${esc(p.label)}</option>`).join('')}</select>` : ''}
+
+    <div class="err" id="err" role="alert"></div>
+    <div class="btns">
+      <button class="btn primary" id="save">${isNew ? 'In de garage zetten' : 'Opslaan'}</button>
+      ${isNew ? '' : '<button class="btn danger" id="del">Motor verwijderen</button>'}
+    </div>`;
+
+  const val = id => document.getElementById(id).value.trim();
+  if(isNew){
+    const ps = document.getElementById('f-preset');
+    const sync = () => { ps.value = guessPreset({merk:val('f-merk'), model:val('f-model')}); };
+    document.getElementById('f-merk').addEventListener('change', sync);
+    document.getElementById('f-model').addEventListener('change', sync);
+  }
+  document.getElementById('save').onclick = () => {
+    const teller = parseKm(val('f-teller'));
+    const missing = [];
+    if(!val('f-merk')) missing.push('merk');
+    if(!val('f-model')) missing.push('model');
+    if(!val('f-datum')) missing.push('aanschafdatum');
+    if(teller === null) missing.push('tellerstand');
+    if(missing.length){ document.getElementById('err').textContent = 'Vul nog in: ' + missing.join(', ') + '.'; return; }
+    Object.assign(m, {
+      merk: val('f-merk'), model: val('f-model'), bouwjaar: val('f-bouwjaar'),
+      kenteken: val('f-kenteken').toUpperCase(), vin: val('f-vin').toUpperCase(),
+      aanschafdatum: val('f-datum'), teller, waarde: parseMoney(val('f-waarde')), opmerkingen: val('f-opm'),
+      type: (document.querySelector('input[name=type]:checked') || {}).value || 'naked',
+      glow: (document.querySelector('input[name=glow]:checked') || {}).value || GLOWS[0],
+      kmPerMaand: parseKm(val('f-rate'))
+    });
+    if(isNew){
+      Object.assign(m, {id:uid(), sheets:[], readings:[], intervals:presetItems(document.getElementById('f-preset').value)});
+      data.motors.push(m);
+    }
+    data.settings.lastMotor = m.id;
+    if(save()){ toast(isNew ? 'Motor staat in de garage' : 'Opgeslagen'); go('motor/' + m.id); }
+  };
+  if(!isNew) document.getElementById('del').onclick = () => {
+    if(!confirm(`${motorName(m)} en al het onderhoud (${m.sheets.length} velletjes) verwijderen? Dit kun je niet ongedaan maken.`)) return;
+    data.motors = data.motors.filter(x => x.id !== m.id);
+    data.settings.lastMotor = null;
+    if(save()){ toast('Motor verwijderd'); go(''); }
+  };
+}
+
+/* ---------- Intervallen ---------- */
+function viewIntervals(m){
+  setBar('Intervallen', '#/motor/' + m.id);
+  const ivHtml = i => `<div class="iv" data-id="${i.id}">
+    <div class="iv-head"><span>${esc(i.naam)} <span class="src">(${i.bron === 'boekje' ? 'instructieboekje' : i.bron === 'eigen' ? 'eigen' : 'schatting'})</span></span>
+      <button type="button" class="icon-btn iv-del" data-sfx="back" aria-label="${esc(i.naam)} verwijderen">✕</button></div>
+    <div class="grid2">
+      <div><label>Elke … km</label><input class="iv-km" inputmode="numeric" value="${i.km ?? ''}" placeholder="geen"></div>
+      <div><label>Of elke … maanden</label><input class="iv-mnd" inputmode="numeric" value="${i.mnd ?? ''}" placeholder="geen"></div>
+      <div><label>Laatst gedaan bij km</label><input class="iv-skm" inputmode="numeric" value="${i.startKm ?? ''}" placeholder="aanschaf"></div>
+      <div><label>Laatst gedaan op</label><input class="iv-sd" type="date" value="${esc(i.startDatum || '')}"></div>
+    </div></div>`;
+  app.innerHTML = `
+    <h2>${esc(motorName(m))}</h2>
+    <p class="muted">Pas de intervallen aan of vul in wanneer iets vóór dit boekje voor het laatst is gedaan. Een velletje met dezelfde soort onderhoud gaat daarna altijd voor.</p>
+    <div class="parts" id="ivs">${m.intervals.map(ivHtml).join('')}</div>
+    <h3>Onderdeel toevoegen</h3>
+    <div class="reading"><input id="iv-new" placeholder="Bijv. Vork-olie"><button class="btn" id="iv-add">Toevoegen</button></div>
+    <div class="btns"><button class="btn primary" id="save">Intervallen opslaan</button></div>
+    <label for="iv-preset">Lijst vervangen door</label>
+    <div class="reading"><select id="iv-preset">${Object.entries(PRESETS).map(([k,p]) => `<option value="${k}">${esc(p.label)}</option>`).join('')}</select>
+      <button class="btn danger" id="iv-reset">Vervangen</button></div>`;
+
+  const box = document.getElementById('ivs');
+  box.addEventListener('click', e => { const b = e.target.closest('.iv-del'); if(b) b.closest('.iv').remove(); });
+  document.getElementById('iv-add').onclick = () => {
+    const naam = document.getElementById('iv-new').value.trim();
+    if(!naam) return;
+    const exists = [...box.querySelectorAll('.iv')].some(el => (m.intervals.find(i => i.id === el.dataset.id) || el._new || {}).naam === naam);
+    if(exists){ toast('Dat onderdeel staat er al'); return; }
+    const item = {id:uid(), naam, km:null, mnd:null, bron:'eigen', startKm:null, startDatum:null};
+    box.insertAdjacentHTML('beforeend', ivHtml(item));
+    box.lastElementChild._new = item;
+    document.getElementById('iv-new').value = '';
+  };
+  document.getElementById('save').onclick = () => {
+    m.intervals = [...box.querySelectorAll('.iv')].map(el => {
+      const base = m.intervals.find(i => i.id === el.dataset.id) || el._new;
+      return {...base,
+        km: parseKm(el.querySelector('.iv-km').value), mnd: parseKm(el.querySelector('.iv-mnd').value),
+        startKm: parseKm(el.querySelector('.iv-skm').value), startDatum: el.querySelector('.iv-sd').value || null};
+    });
+    if(save()){ toast('Intervallen opgeslagen'); go('motor/' + m.id + '/status'); }
+  };
+  document.getElementById('iv-reset').onclick = () => {
+    const key = document.getElementById('iv-preset').value;
+    if(!confirm(`Alle intervallen vervangen door: ${PRESETS[key].label}? Je velletjes blijven gewoon staan.`)) return;
+    m.intervals = presetItems(key);
+    if(save()){ toast('Lijst vervangen'); viewIntervals(m); }
+  };
+}
+
+/* ---------- Velletje ---------- */
+function catList(m, extra){
+  const list = [...m.intervals.map(i => i.naam), ...EXTRA_CATS];
+  if(extra && !list.includes(extra)) list.push(extra);
+  return [...new Set(list)];
+}
+function rowHtml(m, r){
+  r = r || {categorie:'Overig', omschrijving:'', onderdeel:'', kosten:null};
+  return `<div class="row">
+    <div class="row-top">
+      <select class="r-cat" aria-label="Soort onderhoud">${catList(m, r.categorie).map(c => `<option${c === r.categorie ? ' selected' : ''}>${esc(c)}</option>`).join('')}</select>
+      <button type="button" class="icon-btn r-del" data-sfx="back" aria-label="Regel verwijderen">✕</button>
+    </div>
+    <input class="r-oms" aria-label="Omschrijving" placeholder="Wat heb je gedaan? (optioneel)" value="${esc(r.omschrijving)}">
+    <div class="row-two">
+      <input class="r-ond" aria-label="Onderdeel of artikelnummer" placeholder="Onderdeel / artikelnr." value="${esc(r.onderdeel)}">
+      <input class="r-kst" aria-label="Kosten in euro" inputmode="decimal" placeholder="€ kosten" value="${r.kosten != null ? String(r.kosten).replace('.', ',') : ''}">
+    </div>
+  </div>`;
+}
+function viewSheetForm(m, s, preCat){
+  const isNew = !s;
+  s = s || {datum: today(), teller: null, door: 'zelf', garage: '', opmerkingen: '',
+            regels: [preCat ? {categorie:preCat, omschrijving:'', onderdeel:'', kosten:null} : null]};
+  setBar(isNew ? 'Nieuw velletje' : 'Velletje', '#/motor/' + m.id + '/boekje');
+  app.innerHTML = `
+    <h2>${esc(motorName(m))}</h2>
+    <p class="muted">Laatst bekende tellerstand: ${fmtKm(currentKm(m))} km</p>
+    <div class="grid2">
+      <div><label for="s-datum">Datum *</label><input id="s-datum" type="date" value="${esc(s.datum)}"></div>
+      <div><label for="s-teller">Tellerstand (km) *</label><input id="s-teller" inputmode="numeric" value="${s.teller ?? ''}"></div>
+    </div>
+    <div class="grid2">
+      <div><label for="s-door">Uitgevoerd door</label>
+        <select id="s-door"><option value="zelf"${s.door !== 'garage' ? ' selected' : ''}>Zelf</option><option value="garage"${s.door === 'garage' ? ' selected' : ''}>Garage</option></select></div>
+      <div id="garage-wrap"${s.door === 'garage' ? '' : ' hidden'}><label for="s-garage">Naam garage</label><input id="s-garage" value="${esc(s.garage)}"></div>
+    </div>
+    <h3>Onderhoudsregels</h3>
+    <p class="muted small">Tik om snel een regel toe te voegen:</p>
+    <div class="chips" id="chips">${m.intervals.map(i => `<button type="button" class="chip" data-cat="${esc(i.naam)}">${esc(i.naam)}</button>`).join('')}</div>
+    <div class="rows" id="rows">${s.regels.map(r => rowHtml(m, r)).join('')}</div>
+    <div class="btns"><button type="button" class="btn" id="add">Lege regel</button></div>
+    <label for="s-opm">Opmerkingen</label>
+    <textarea id="s-opm" placeholder="Bijv. ketting bijna aan vervanging toe, lekkage gezien bij voorvork">${esc(s.opmerkingen)}</textarea>
+    <div class="err" id="err" role="alert"></div>
+    <div class="btns">
+      <button class="btn primary" id="save">${isNew ? 'Velletje opslaan' : 'Opslaan'}</button>
+      ${isNew ? '' : '<button class="btn danger" id="del">Verwijderen</button>'}
+    </div>`;
+
+  const rows = document.getElementById('rows');
+  const isEmptyRow = r => !r.querySelector('.r-oms').value.trim() && !r.querySelector('.r-ond').value.trim() && !r.querySelector('.r-kst').value.trim() && r.querySelector('.r-cat').value === 'Overig';
+  document.getElementById('s-door').onchange = e => { document.getElementById('garage-wrap').hidden = e.target.value !== 'garage'; };
+  document.getElementById('add').onclick = () => { rows.insertAdjacentHTML('beforeend', rowHtml(m)); rows.lastElementChild.querySelector('.r-oms').focus(); };
+  document.getElementById('chips').addEventListener('click', e => {
+    const c = e.target.closest('.chip'); if(!c) return;
+    const lone = rows.children.length === 1 && isEmptyRow(rows.firstElementChild);
+    if(lone) rows.innerHTML = '';
+    rows.insertAdjacentHTML('beforeend', rowHtml(m, {categorie:c.dataset.cat, omschrijving:'', onderdeel:'', kosten:null}));
+    toast(c.dataset.cat + ' toegevoegd');
+  });
+  rows.addEventListener('click', e => {
+    const btn = e.target.closest('.r-del'); if(!btn) return;
+    if(rows.children.length === 1){ rows.innerHTML = rowHtml(m); return; }
+    btn.closest('.row').remove();
+  });
+
+  document.getElementById('save').onclick = () => {
+    const err = document.getElementById('err');
+    const datum = document.getElementById('s-datum').value;
+    const teller = parseKm(document.getElementById('s-teller').value);
+    const regels = [...rows.querySelectorAll('.row')].filter(r => !isEmptyRow(r)).map(r => ({
+      categorie: r.querySelector('.r-cat').value,
+      omschrijving: r.querySelector('.r-oms').value.trim(),
+      onderdeel: r.querySelector('.r-ond').value.trim(),
+      kosten: parseMoney(r.querySelector('.r-kst').value)
+    }));
+    if(!datum || teller === null){ err.textContent = 'Vul de datum en de tellerstand in.'; return; }
+    if(!regels.length){ err.textContent = 'Voeg minstens één onderhoudsregel toe.'; return; }
+    regels.forEach(r => { if(!r.omschrijving) r.omschrijving = r.categorie; });
+    if(teller < (m.teller || 0) && !confirm(`De tellerstand (${fmtKm(teller)} km) is lager dan bij aanschaf (${fmtKm(m.teller)} km). Toch opslaan?`)) return;
+    Object.assign(s, {
+      datum, teller, regels,
+      door: document.getElementById('s-door').value,
+      garage: document.getElementById('s-garage').value.trim(),
+      opmerkingen: document.getElementById('s-opm').value.trim()
+    });
+    if(isNew){ s.id = uid(); m.sheets.push(s); }
+    if(save()){ toast(isNew ? 'Velletje opgeslagen' : 'Opgeslagen'); go('motor/' + m.id + '/boekje'); }
+  };
+  if(!isNew) document.getElementById('del').onclick = () => {
+    if(!confirm('Dit velletje verwijderen? Dit kun je niet ongedaan maken.')) return;
+    m.sheets = m.sheets.filter(x => x.id !== s.id);
+    if(save()){ toast('Velletje verwijderd'); go('motor/' + m.id + '/boekje'); }
+  };
+}
+
+/* ---------- Uitdraai ---------- */
+function printMotor(m){
+  const row = (k, v) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`;
+  const sheets = sortedSheets(m, true);
+  const status = m.intervals.map(i => ({i, st:itemStatus(m, i)})).filter(x => x.st);
+  document.getElementById('print').innerHTML = `
+    <h1 class="p-title">Onderhoudsboekje ${esc(motorName(m))}</h1>
+    <p class="p-sub">Uitgedraaid op ${fmtDate(today())}</p>
+    <table class="p-facts">
+      ${row('Merk en model', motorName(m))}
+      ${row('Type', typeLabel(m.type))}
+      ${m.bouwjaar ? row('Bouwjaar', m.bouwjaar) : ''}
+      ${m.kenteken ? row('Kenteken', m.kenteken) : ''}
+      ${m.vin ? row('Framenummer', m.vin) : ''}
+      ${row('Aanschafdatum', fmtDate(m.aanschafdatum))}
+      ${row('Tellerstand bij aanschaf', fmtKm(m.teller) + ' km')}
+      ${m.waarde != null ? row('Aanschafwaarde', fmtEur(m.waarde)) : ''}
+      ${row('Laatst bekende tellerstand', fmtKm(currentKm(m)) + ' km')}
+      ${row('Aantal onderhoudsbeurten', String(m.sheets.length))}
+    </table>
+    ${m.opmerkingen ? `<p class="p-note">${esc(m.opmerkingen)}</p>` : ''}
+    <h2 class="p-h2">Onderhoud</h2>
+    ${sheets.length ? sheets.map(s => `
+      <section class="p-sheet">
+        <h3><span>${fmtDate(s.datum)}</span><span>${fmtKm(s.teller)} km</span></h3>
+        <div>${esc(doorText(s))}</div>
+        <table class="p-rows">
+          <thead><tr><th>Soort</th><th>Omschrijving</th><th>Onderdeel</th><th class="num">Kosten</th></tr></thead>
+          <tbody>${s.regels.map(r => `<tr><td>${esc(r.categorie)}</td><td>${esc(r.omschrijving)}</td><td>${esc(r.onderdeel)}</td><td class="num">${r.kosten != null ? fmtEur(r.kosten) : ''}</td></tr>`).join('')}</tbody>
+        </table>
+        ${s.opmerkingen ? `<p class="p-note">${esc(s.opmerkingen)}</p>` : ''}
+      </section>`).join('') : '<p>Nog geen onderhoud genoteerd.</p>'}
+    <div class="p-total">Totale onderhoudskosten: ${fmtEur(motorCost(m))}</div>
+    ${status.length ? `<h2 class="p-h2">Onderhoudsstatus op ${fmtDate(today())}</h2>
+      <table class="p-rows"><thead><tr><th>Onderdeel</th><th>Interval</th><th>Laatst gedaan</th><th>Volgende</th></tr></thead>
+      <tbody>${status.map(({i, st}) => `<tr><td>${esc(i.naam)}</td>
+        <td>${[i.km ? fmtKm(i.km) + ' km' : '', i.mnd ? i.mnd + ' mnd' : ''].filter(Boolean).join(' of ')}</td>
+        <td>${fmtKm(st.ld.km)} km, ${fmtDate(st.ld.datum)}</td>
+        <td>${[st.dueKm != null ? fmtKm(st.dueKm) + ' km' : '', st.dueDate ? fmtMonth(st.dueDate) : ''].filter(Boolean).join(' of ')}</td></tr>`).join('')}</tbody></table>` : ''}`;
+  window.print();
+}
+
+/* ---------- Back-up ---------- */
+async function exportData(){
+  const name = `garage-backup-${today()}.json`;
+  const json = JSON.stringify({...data, lastBackup:new Date().toISOString()}, null, 2);
+  const file = new File([json], name, {type:'application/json'});
+  const done = () => { data.lastBackup = new Date().toISOString(); save(); toast('Back-up opgeslagen'); route(); };
+  // Eerst via het deelmenu van de telefoon (iCloud Drive, Google Drive, Bestanden, WhatsApp ...)
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file], title:'Back-up garage'});
+      return done();
+    }catch(err){
+      if(err.name === 'AbortError'){ toast('Back-up geannuleerd'); return; }
+      // Delen lukt niet om een andere reden: dan gewoon downloaden
+    }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  done();
+}
+document.getElementById('importFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const d = JSON.parse(reader.result);
+      if(!d || !Array.isArray(d.motors)) throw new Error();
+      const n = d.motors.length;
+      if(!confirm(`Back-up met ${n} ${n === 1 ? 'motor' : 'motoren'} terugzetten? Alles wat nu in de app staat wordt vervangen.`)) return;
+      const sound = data.settings.sound;
+      data = migrate(d);
+      data.settings.sound = sound;
+      if(save()){ toast('Back-up teruggezet'); location.hash = '#/'; route(); }
+    }catch(err){
+      alert('Dit bestand is geen geldige back-up. Kies het .json-bestand dat je met Back-up opslaan hebt gemaakt.');
+    }
+  };
+  reader.readAsText(file);
+});
+
+/* ---------- Intro ---------- */
+(function intro(){
+  let seen = false;
+  try{ seen = sessionStorage.getItem('garage-intro') === '1'; }catch(e){}
+  const el = document.getElementById('intro');
+  if(seen){ route(); return; }
+  el.hidden = false;
+  menuAnimated = true; // de intro is het grote moment; menu niet nog eens laten inschuiven
+  const start = () => {
+    Sfx.init(); Sfx.intro();
+    try{ sessionStorage.setItem('garage-intro', '1'); }catch(e){}
+    menuAnimated = false;
+    route();
+    el.classList.add('go');
+    setTimeout(() => { el.hidden = true; }, 560);
+  };
+  el.addEventListener('click', start, {once:true});
+  el.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' ') start(); }, {once:true});
+  el.focus();
+})();
+</script>
+</body>
+</html>
